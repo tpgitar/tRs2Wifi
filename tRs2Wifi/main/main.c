@@ -17,6 +17,9 @@ extern void setLedGreen();
 extern void setLedBlue();
 extern void setLedRed();
 extern void initWifi(void);
+
+extern void tcp_server_task(void *pvParameters);
+
 //--------------------------------------------------------------
 
 void app_main(void)
@@ -35,7 +38,14 @@ void app_main(void)
 	
 	initWifi();
 	
-uint8_t ucCnt = 0;
+
+   xTaskCreate(tcp_server_task,
+               "tcp_server",
+               8192,
+               NULL,
+               5,
+               NULL);	
+
 	
     while (true) 
     {

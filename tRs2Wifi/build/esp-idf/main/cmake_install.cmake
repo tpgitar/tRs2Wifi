@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/t_pro/workspace/tRs2Wifi/main
+# Install script for directory: C:/Users/t_pro/git/tRs2Wifi/tRs2Wifi/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

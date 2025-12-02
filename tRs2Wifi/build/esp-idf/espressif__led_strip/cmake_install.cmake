@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/t_pro/workspace/tRs2Wifi/managed_components/espressif__led_strip
+# Install script for directory: C:/Users/t_pro/git/tRs2Wifi/tRs2Wifi/managed_components/espressif__led_strip
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
