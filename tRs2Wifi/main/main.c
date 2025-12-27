@@ -17,6 +17,7 @@ extern void setLedGreen();
 extern void setLedBlue();
 extern void setLedRed();
 extern void initWifi(void);
+extern void configureUart();
 
 extern void tcp_server_task(void *pvParameters);
 
@@ -27,6 +28,8 @@ void app_main(void)
 	
 	configure_led();
 	
+	configureUart();
+
 	
 	xTaskCreate(task_Led_500ms,        // funkcja taska
                 "task_Led",      // nazwa taska
@@ -45,6 +48,8 @@ void app_main(void)
                NULL,
                5,
                NULL);	
+
+
 
 	
     while (true) 
