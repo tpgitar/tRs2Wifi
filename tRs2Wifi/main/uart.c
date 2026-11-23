@@ -5,11 +5,11 @@
  *      Author: t_pro
  */
 
-#include <stdio.h>
-#include <string.h>
+#include "esp_err.h"
+#include "esp_intr_alloc.h"
 #include "driver/uart.h"
-#include "driver/gpio.h"
 #include "esp_log.h"
+#include "uart.h"
 
 //----------------------------------------------------------------
 
@@ -32,14 +32,10 @@
 
 static const char *TAG = "UART";
 
-#define BUF_SIZE (1024)
+#define BUF_SIZE 1024
 
-
-
-void configureUart()
+esp_err_t configureUart(void)
 {
-	    /* Configure parameters of an UART driver,
-     * communication pins and install the driver */
     uart_config_t uart_config = {
         .baud_rate = ECHO_UART_BAUD_RATE,
         .data_bits = UART_DATA_8_BITS,
@@ -54,11 +50,27 @@ void configureUart()
     intr_alloc_flags = ESP_INTR_FLAG_IRAM;
 #endif
 
-    ESP_ERROR_CHECK(uart_driver_install(ECHO_UART_PORT_NUM, BUF_SIZE * 2, 0, 0, NULL, intr_alloc_flags));
-    ESP_ERROR_CHECK(uart_param_config(ECHO_UART_PORT_NUM, &uart_config));
-    ESP_ERROR_CHECK(uart_set_pin(ECHO_UART_PORT_NUM, ECHO_TEST_TXD, ECHO_TEST_RXD, ECHO_TEST_RTS, ECHO_TEST_CTS));
+    esp_err_t err = uart_driver_install(ECHO_UART_PORT_NUM, BUF_SIZE * 2, 0, 0,
+                                        NULL, intr_alloc_flags);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "UART driver installation failed: %s", esp_err_to_name(err));
+        return err;
+    }
 
-    // Configure a temporary buffer for the incoming data
-    uint8_t *data = (uint8_t *) malloc(BUF_SIZE);
+    err = uart_param_config(ECHO_UART_PORT_NUM, &uart_config);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "UART parameter configuration failed: %s", esp_err_to_name(err));
+        uart_driver_delete(ECHO_UART_PORT_NUM);
+        return err;
+    }
 
+    err = uart_set_pin(ECHO_UART_PORT_NUM, ECHO_TEST_TXD, ECHO_TEST_RXD,
+                       ECHO_TEST_RTS, ECHO_TEST_CTS);
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "UART pin configuration failed: %s", esp_err_to_name(err));
+        uart_driver_delete(ECHO_UART_PORT_NUM);
+        return err;
+    }
+
+    return ESP_OK;
 }

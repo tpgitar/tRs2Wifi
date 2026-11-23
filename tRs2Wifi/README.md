@@ -1,11 +1,48 @@
-ESP-IDF template app
-====================
+# tRs2Wifi
 
-This is a template application to be used with [Espressif IoT Development Framework](https://github.com/espressif/esp-idf).
+RS232-to-Wi-Fi adapter based on ESP32-C3-MINI-1 and ESP-IDF 6.1.
 
-Please check [ESP-IDF docs](https://docs.espressif.com/projects/esp-idf/en/latest/get-started/index.html) for getting started instructions.
+## Communication
 
-*Code in this repository is in the Public Domain (or CC0 licensed, at your option.)
-Unless required by applicable law or agreed to in writing, this
-software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-CONDITIONS OF ANY KIND, either express or implied.*
+- TCP server listens on all IPv4 interfaces on port `2000`.
+- UART1 uses `57600 8N1`, TX GPIO4 and RX GPIO5.
+- A TCP client is bridged to UART1 in both directions.
+- One TCP session is supported at a time.
+- TCP is a byte stream and has no application-level message boundaries.
+- An idle session closes after 60 seconds without traffic in either direction.
+
+## Wi-Fi
+
+Configure `ESP_WIFI_SSID` and `ESP_WIFI_PASSWORD` in ESP-IDF:
+
+```text
+idf.py menuconfig
+```
+
+The values are stored in ignored local `sdkconfig.local`. Do not publish this file or credentials.
+
+Startup retries Wi-Fi 10 times and then retries every 5 seconds. Losing Wi-Fi or its IP address stops an active TCP session and reconnects automatically.
+
+## LED status
+
+- Red: no active Wi-Fi connection.
+- Blue: associated with the access point before IP acquisition.
+- Green: connected and IP address acquired.
+- When TCP is connected, the LED blink period is 150 ms instead of 300 ms.
+
+## Build
+
+```powershell
+cd tRs2Wifi
+idf.py set-target esp32c3
+idf.py build
+idf.py -p COM7 flash monitor
+```
+
+## Tests
+
+Run the TCP acceptance tests from the project directory:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ".\Copilot\Test\run_tests.ps1" -Address <device-ip> -Port 2000
+```

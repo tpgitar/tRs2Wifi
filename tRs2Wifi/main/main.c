@@ -1,96 +1,44 @@
-#include <stdint.h>
-#include <stdio.h>
-#include <stdbool.h>
-#include <unistd.h>
-
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+#include "Led.h"
+#include "Wifi.h"
+#include "tcpServer.h"
+#include "uart.h"
 
-
-
-
-//--------------------------------------------------------------
-extern void configure_led(void);
-extern void task_Led_500ms(void *pvParameters);
-extern void setLedGreen();
-extern void setLedBlue();
-extern void setLedRed();
-extern void initWifi(void);
-extern void configureUart();
-
-extern void tcp_server_task(void *pvParameters);
-
-//--------------------------------------------------------------
+static const char *TAG = "app";
 
 void app_main(void)
 {
-	
-	configure_led();
-	
-	configureUart();
+    esp_err_t err = configure_led();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "LED initialization failed: %s", esp_err_to_name(err));
+        return;
+    }
 
-	
-	xTaskCreate(task_Led_500ms,        // funkcja taska
-                "task_Led",      // nazwa taska
-                1024,              // rozmiar stosu
-                NULL,              // parametry
-                5,                 // priorytet
-                NULL);             // uchwyt (opcjonalnie)
-	
-	
-	initWifi();
-	
+    err = configureUart();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "UART initialization failed: %s", esp_err_to_name(err));
+        return;
+    }
 
-   xTaskCreate(tcp_server_task,
-               "tcp_server",
-               8192,
-               NULL,
-               5,
-               NULL);	
+    TaskHandle_t led_task_handle = NULL;
+    if (xTaskCreate(task_Led_500ms, "task_led_blink", 1024, NULL, 5,
+                    &led_task_handle) != pdPASS) {
+        ESP_LOGE(TAG, "Failed to create LED task");
+        return;
+    }
 
+    err = initWifi();
+    if (err != ESP_OK) {
+        ESP_LOGE(TAG, "Wi-Fi initialization failed: %s", esp_err_to_name(err));
+        vTaskDelete(led_task_handle);
+        return;
+    }
 
-
-	
-    while (true) 
-    {
-	
-		//blink_led();
-		
-	/*	
-		ucCnt++;
-		if(ucCnt > 3)
-		{ucCnt = 0;}
-		
-		switch(ucCnt)
-		{
-			case 0:
-			{
-				setLedRed();
-			}break;
-
-			case 1:
-			{
-				setLedGreen();
-			}break;
-			
-			case 2:
-			{
-				setLedBlue();
-			}break;
-
-			
-		}*/
-		
-		
-		
-   //     printf("1  Hello from app_main!\n");
-        
-        
-        
-        
-        
-        sleep(1);
+    if (wifiIsConnected()) {
+        if (!tcp_server_start()) {
+            ESP_LOGE(TAG, "Failed to start TCP server");
+        }
     }
 }
-//--------------------------------------------------------------

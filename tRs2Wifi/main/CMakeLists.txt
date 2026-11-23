@@ -2,9 +2,20 @@
 # for more information about component CMakeLists.txt files.
 
 idf_component_register(
-    SRCS main.c Led.c Wifi.c tcpServer.c uart.c     # list the source files of this component
-    INCLUDE_DIRS        # optional, add here public include directories
-    PRIV_INCLUDE_DIRS   # optional, add here private include directories
-    REQUIRES            # optional, list the public requirements (component names)
-    PRIV_REQUIRES       # optional, list the private requirements
+    SRCS main.c Led.c Wifi.c tcpServer.c uart.c
+    PRIV_REQUIRES
+        esp_common
+        esp_event
+        esp_driver_gpio
+        esp_driver_uart
+        esp_hw_support
+        esp_netif
+        esp_system
+        esp_timer
+        esp_wifi
+        freertos
+        led_strip
+        log
+        lwip
+        nvs_flash
 )

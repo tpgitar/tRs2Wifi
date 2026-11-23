@@ -1,0 +1,23 @@
+{
+    "idf.currentSetup": "C:\\esp\\v6.1\\esp-idf",
+    "idf.openOcdConfigs": [
+        "board/esp32c3-builtin.cfg"
+    ],
+    "idf.customExtraVars": {
+        "IDF_PATH": "C:\\esp\\v6.1\\esp-idf",
+        "IDF_TOOLS_PATH": "C:\\Espressif",
+        "IDF_PYTHON_ENV_PATH": "C:\\Espressif\\tools\\python\\v6.1\\venv",
+        "IDF_PYTHON_CHECK_CONSTRAINTS": "no",
+        "PYTHONUTF8": "1",
+        "IDF_TARGET": "esp32c3",
+        "OPENOCD_USB_ADAPTER_LOCATION": "2-1"
+    },
+    "clangd.path": "C:\\Espressif\\tools\\esp-clangd\\esp-21.1.3_20260408\\esp-clangd\\bin\\clangd.exe",
+    "clangd.arguments": [
+      "--background-index",
+      "--query-driver=**",
+      "--compile-commands-dir=e:\\Tomek\\EspIff_Workspace\\tRs2Wifi\\tRs2Wifi\\build"
+    ],
+    "idf.flashType": "UART",
+    "idf.port": "COM7"
+}
